@@ -85,7 +85,8 @@ public class DumpParserFactory {
                     currentDumpParser = new SunJDKParser(bis, threadStore, lineCounter, withCurrentTimeStamp, startCounter, dm);
                 } else if(BeaJDKParser.checkForSupportedThreadDump(line)) {
                     currentDumpParser = new BeaJDKParser(bis, threadStore, lineCounter, dm);
-                }
+                } else
+                    currentDumpParser = new SunJDKParser(bis, threadStore, lineCounter, withCurrentTimeStamp, startCounter, dm, true);
                 lineCounter++;
             }
             //System.out.println("Selected Dump Parser: " + currentDumpParser.getClass().getName());

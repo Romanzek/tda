@@ -47,7 +47,7 @@ import javax.swing.tree.MutableTreeNode;
  * @author irockel
  */
 public class SunJDKParser extends AbstractDumpParser {
-
+    private final boolean unlocked;
     private MutableTreeNode nextDump = null;
     private Map threadStore = null;
     private int counter = 1;
@@ -55,15 +55,30 @@ public class SunJDKParser extends AbstractDumpParser {
     private boolean foundClassHistograms = false;
     private boolean withCurrentTimeStamp = false;
 
-    /** 
+    /**
+     * Creates a new instance of SunJDKParser
+ * @param bis
+ * @param threadStore
+ * @param lineCounter
+ * @param withCurrentTimeStamp
+ * @param startCounter
+ * @param dm
+     */
+    public SunJDKParser(BufferedReader bis, Map threadStore, int lineCounter, boolean withCurrentTimeStamp,
+        int startCounter, DateMatcher dm) {
+        this(bis, threadStore, lineCounter, withCurrentTimeStamp, startCounter, dm, false);
+    }
+
+    /**
      * Creates a new instance of SunJDKParser 
      */
-    public SunJDKParser(BufferedReader bis, Map threadStore, int lineCounter, boolean withCurrentTimeStamp, int startCounter, DateMatcher dm) {
+    public SunJDKParser(BufferedReader bis, Map threadStore, int lineCounter, boolean withCurrentTimeStamp, int startCounter, DateMatcher dm, boolean unlocked) {
         super(bis, dm);
         this.threadStore = threadStore;
         this.withCurrentTimeStamp = withCurrentTimeStamp;
         this.lineCounter = lineCounter;
         this.counter = startCounter;
+        this.unlocked = true;
     }
 
     /**
@@ -139,7 +154,7 @@ public class SunJDKParser extends AbstractDumpParser {
                 int waiting = 0;
                 int locking = 0;
                 int sleeping = 0;
-                boolean locked = true;
+                boolean locked = !unlocked;
                 boolean finished = false;
                 MonitorMap mmap = new MonitorMap();
                 Stack monitorStack = new Stack();

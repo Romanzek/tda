@@ -2139,7 +2139,7 @@ public class TDA extends JPanel implements ListSelectionListener, TreeSelectionL
             result = (String) info;
         }
         
-        if(startIndex > 0) {
+        if(startIndex > 0 && result != null) {
             result = result.substring(startIndex);
         }
         

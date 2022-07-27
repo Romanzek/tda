@@ -76,17 +76,18 @@ public class ThreadsTableModel extends AbstractTableModel {
         ThreadInfo ti = ((ThreadInfo) elements.elementAt(rowIndex));
         String[] columns = ti.getTokens();
         //System.out.println("Info: " + ti.getInfo() + ", rowIndex"  + rowIndex + ", columnIndex: " + columnIndex);
+        final String value = columns[columnIndex];
         if(getColumnCount() > 3) {
             if (columnIndex > 1 && columnIndex < 5) {
-                return new Long(columns[columnIndex]);
+                return new Long("NA".equals(value) ? "0" : value);
             } else {
-                return columns[columnIndex];
+                return value;
             }
         } else {
             if (columnIndex == 1) {
-                return new Long(columns[columnIndex]);
+                return new Long(value);
             } else {
-                return columns[columnIndex];
+                return value;
             }
             
         }

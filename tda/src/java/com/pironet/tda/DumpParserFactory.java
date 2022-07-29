@@ -24,9 +24,13 @@ package com.pironet.tda;
 import com.pironet.tda.utils.DateMatcher;
 import com.pironet.tda.utils.PrefManager;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Map;
 
 /**
@@ -66,6 +70,8 @@ public class DumpParserFactory {
      */
     public DumpParser getDumpParserForLogfile(InputStream dumpFileStream, Map threadStore, boolean withCurrentTimeStamp, int startCounter) {
         BufferedReader bis = null;
+        ByteArrayOutputStream ideaDump = new ByteArrayOutputStream();
+        final BufferedWriter ideaOs = new BufferedWriter(new OutputStreamWriter(ideaDump));
         int readAheadLimit = PrefManager.get().getStreamResetBuffer();
         int lineCounter = 0;
         DumpParser currentDumpParser = null;
@@ -85,14 +91,25 @@ public class DumpParserFactory {
                     currentDumpParser = new SunJDKParser(bis, threadStore, lineCounter, withCurrentTimeStamp, startCounter, dm);
                 } else if(BeaJDKParser.checkForSupportedThreadDump(line)) {
                     currentDumpParser = new BeaJDKParser(bis, threadStore, lineCounter, dm);
-                } else
-                    currentDumpParser = new SunJDKParser(bis, threadStore, lineCounter, withCurrentTimeStamp, startCounter, dm, true);
+                }
+                if (ideaDump != null) {
+                    if (ideaDump.size() < 10 * 1024 * 1024) {
+                        ideaOs.write(line);
+                        ideaOs.newLine();
+                    } else {
+                        ideaDump = null;
+                    }
+                }
                 lineCounter++;
             }
             //System.out.println("Selected Dump Parser: " + currentDumpParser.getClass().getName());
-            if ((currentDumpParser != null) && (bis != null)) {
-                bis.reset();
+            if (currentDumpParser == null && ideaDump != null) {
+                ideaOs.flush();
+                bis = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(ideaDump.toByteArray())));
+                currentDumpParser = new SunJDKParser(bis, threadStore, 0, withCurrentTimeStamp, startCounter, dm, true);
             }
+            else
+                bis.reset();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

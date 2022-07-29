@@ -78,7 +78,7 @@ public class SunJDKParser extends AbstractDumpParser {
         this.withCurrentTimeStamp = withCurrentTimeStamp;
         this.lineCounter = lineCounter;
         this.counter = startCounter;
-        this.unlocked = true;
+        this.unlocked = unlocked;
     }
 
     /**
